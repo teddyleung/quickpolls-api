@@ -2,13 +2,12 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-const port = process.env.PORT || 3000;
+ // TODO: Update for production
+io.origins(['http://localhost:3000', 'http://localhost:5000']);
+
+const port = process.env.PORT || 5000;
 server.listen(port, () => {
   console.log(`Listening on port ${port}...`);
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
 });
 
 let numParticipants = 0;
@@ -19,10 +18,12 @@ let poll = {
 }
 
 io.on('connection', socket => {
+  console.log('connected: ', socket.id);
   numParticipants++;
   io.emit('connected', { numParticipants, poll });
   
-  socket.on('disconnect', reason => {
+  socket.on('disconnect', () => {
+    console.log('disconnected: ', socket.id);
     numParticipants--;
     io.emit('disconnected', numParticipants);
   });
