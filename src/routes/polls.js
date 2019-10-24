@@ -37,7 +37,30 @@ router.route('/:slug').put((req, res) => {
     } else {
       res.status(400).json({ error: 'The poll is published and cannot be updated' });
     }
-  })
+  });
+});
+
+router.route('/:slug/publish').put((req, res) => {
+  Poll.findOneAndUpdate(
+    {
+      slug: req.params.slug
+    }, 
+    {
+      isPublished: true
+    },
+    {
+      new: true,
+      runValidators: true
+    }
+  )
+    .then(poll => {
+      if (poll === null) {
+        res.status(400).json({ error: `Unable to find poll with id ${req.params.slug}` });
+      } else {
+        res.json(poll);
+      }
+    })
+    .catch(() => res.status(400).json({ error: 'Failed to publish poll' }));
 });
 
 module.exports = router;
