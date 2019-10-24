@@ -21,6 +21,18 @@ router.route('/').post((req, res) => {
     .catch(() => res.status(400).json({ error: 'Failed to created poll' }));
 });
 
+router.route('/:slug').get((req, res) => {
+  Poll.findOne({ slug: req.params.slug })
+    .then(poll => {
+      if (poll === null) {
+        res.status(400).json({ error: `Unable to find poll with id ${req.params.slug}` });
+      } else {
+        res.json(poll);
+      }
+    })
+    .catch(() => res.status(400).json({ error: 'Failed to get poll' }));
+});
+
 router.route('/:slug').put((req, res) => {
   Poll.findOne({ slug: req.params.slug }, (err, poll) => {
     if (err || poll === null) {
